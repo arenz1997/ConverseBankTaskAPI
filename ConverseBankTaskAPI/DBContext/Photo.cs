@@ -6,6 +6,6 @@ namespace ConverseBankTaskAPI.DBContext
     {
         [Key]
         public int Id { get; set; }
-        public byte[] PhotoBinary { get; set; }
+        public byte[] PhotoByteArray { get; set; }
     }
 }
