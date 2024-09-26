@@ -1,4 +1,4 @@
-using ConverseBankTaskAPI.DataBaseContext;
+using ConverseBankTaskAPI.DBContext;
 using ConverseBankTaskAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,22 +9,32 @@ namespace ConverseBankTaskAPI.Controllers
     public class GeneralController : ControllerBase
     {
         string Path { get; set; }
-        Context dbContext { get; set; }
+        ApplicationDbContext dbContext { get; set; }
 
 
-        public GeneralController(Context context)
+        public GeneralController(ApplicationDbContext context)
         {
-            dbContext = new Context();
+            dbContext = context;            
             dbContext.Database.EnsureCreated();
 
-            Path = AppDomain.CurrentDomain.BaseDirectory;
+            Path = AppDomain.CurrentDomain.BaseDirectory+"Image.jpg";
             
         }
 
-        [HttpPost(Name = "GetImage")]
-        public string Post(OperationModel model)
+        [HttpPost(Name = "SaveImage")]
+        public string SaveImage(PhotoModel model)
         {
-            return "Success";
+            if (ModelState.IsValid)
+            {
+                switch (model.OperationMethod)
+                {
+                    case "DB": dbContext.Photos.Add(new Photo { PhotoBinary = model.PhotoBinary }); dbContext.SaveChanges(); return "Success";
+                    case "FS": System.IO.File.WriteAllBytes(Path, model.PhotoBinary); return "Success";
+                    default: return "Unknown operation!!!";
+                };
+            }
+            else
+                return "Uncorrect input parameters!!!";
         }
     }
 }
